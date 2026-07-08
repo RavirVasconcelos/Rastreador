@@ -1,0 +1,50 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+logs/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Test results
+TestResults/
+coverage/
+coverage.*
+
+# Arquivos locais de configuração / segredos
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Production.json
+
+# Variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Banco local
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+
+# Publicação
+publish/
+artifacts/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
