@@ -1,6 +1,6 @@
 ﻿namespace Rastreador.Models
 {
-    public class Rastreador
+    public class RastreadorModulo
     {
         public int RastreadorId { get; set; }
         public string Identificador { get; set; }

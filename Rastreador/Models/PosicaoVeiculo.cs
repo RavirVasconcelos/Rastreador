@@ -8,7 +8,7 @@
         public DateTime DataHora { get; set; }
 
         public int RastreadorId { get; set; }
-        public Rastreador? Rastreador { get; set; }
+        public RastreadorModulo? Rastreador { get; set; }
 
         public bool Ancorado { get; set; }
     }

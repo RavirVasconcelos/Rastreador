@@ -6,7 +6,7 @@
 
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public double RaioMetros { get; set; }
+        public double RaioMetros { get; set; } = 300;
 
         public bool Ativa { get; set; }
 

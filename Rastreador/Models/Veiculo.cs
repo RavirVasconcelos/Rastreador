@@ -14,9 +14,9 @@ namespace Rastreador.Models
         public int ClienteId { get; set; }
         public Cliente? Cliente { get; set; }
 
-        public Rastreador? Rastreador { get; set; }
+        public RastreadorModulo? Rastreador { get; set; }
         public Ancoragem? Ancoragem { get; set; }
 
-        public ICollection<PosicaoVeiculo> Posicoes { get; set; } = new Collection<PosicaoVeiculo>();
+        //public ICollection<PosicaoVeiculo> Posicoes { get; set; } = new Collection<PosicaoVeiculo>();
     }
 }
