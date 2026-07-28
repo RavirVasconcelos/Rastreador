@@ -7,8 +7,8 @@
         public double Longitude { get; set; }
         public DateTime DataHora { get; set; }
 
-        public int RastreadorId { get; set; }
-        public RastreadorModulo? Rastreador { get; set; }
+        public int RastreadorModuloId { get; set; }
+        public RastreadorModulo? RastreadorModulo { get; set; }
 
         public bool Ancorado { get; set; }
     }

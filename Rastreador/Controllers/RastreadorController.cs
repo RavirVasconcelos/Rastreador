@@ -18,6 +18,24 @@ namespace Rastreador.Controllers
             _context = context;
         }
 
+        [HttpPost("CadastrarRastreador")]
+        public async Task<IActionResult> CadastrarRastreador(RastreadorModulo rastreador)
+        {
+            var veiculoExistente = await _context.Veiculos.FindAsync(rastreador.VeiculoId);
+
+            if (veiculoExistente == null)
+            {
+                return BadRequest("Veículo não encontrado.");
+            }
+
+            rastreador.Ativo = true;
+            rastreador.ModoEconomia = false;
+            rastreador.UltimaAtualizacao = DateTime.Now;
+            _context.Rastreadors.Add(rastreador);
+            await _context.SaveChangesAsync();
+            return Ok("Rastreador cadastrado com sucesso.");
+        }
+
         [HttpGet("GetLocalizacaoAtual")]
         public async Task<IActionResult> GetLocalizacaoAtual(int veiculoId, double latitude, double longitude)
         {

@@ -10,13 +10,12 @@ namespace Rastreador.Models
         public string? MarcaModelo { get; set; }
         public TipoVeiculo? TipoVeiculo { get; set; }
         public int? AnoVeiculo { get; set; }
+        public string CpfProprietario { get; set; }
 
         public int ClienteId { get; set; }
         public Cliente? Cliente { get; set; }
 
         public RastreadorModulo? Rastreador { get; set; }
         public Ancoragem? Ancoragem { get; set; }
-
-        //public ICollection<PosicaoVeiculo> Posicoes { get; set; } = new Collection<PosicaoVeiculo>();
     }
 }

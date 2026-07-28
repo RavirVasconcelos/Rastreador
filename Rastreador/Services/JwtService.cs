@@ -19,7 +19,7 @@ namespace Rastreador.Services
         {
             var claims = new List<Claim>
             {
-                new("UsuarioId", cliente.ClienteId.ToString()),
+                new("Id", cliente.ClienteId.ToString()),
                 new(JwtRegisteredClaimNames.Email, cliente.Email),
                 new("Cpf", cliente.Cpf),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

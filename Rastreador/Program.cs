@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Rastreador.Context;
+using Rastreador.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +32,8 @@ builder.Services
         };
     });
 builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -61,6 +66,10 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<RastreadorContext>(options =>
+    options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 
