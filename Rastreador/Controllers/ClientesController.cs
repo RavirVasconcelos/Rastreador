@@ -73,7 +73,8 @@ namespace Rastreador.Controllers
                 Email = cadastrarClienteDTO.Email,
                 Senha = cadastrarClienteDTO.Senha,
                 Cpf = cadastrarClienteDTO.Cpf,
-                DataNascimento = dataNascimento
+                DataNascimento = dataNascimento,
+                DataCadastro = DateTime.UtcNow
             };
 
             _rastreadorContext.Clientes.Add(cliente);

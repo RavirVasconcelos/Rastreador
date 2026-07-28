@@ -28,9 +28,10 @@ namespace Rastreador.Controllers
                 return BadRequest("Veículo não encontrado.");
             }
 
+            rastreador.DataCadastro = DateTime.UtcNow;
             rastreador.Ativo = true;
             rastreador.ModoEconomia = false;
-            rastreador.UltimaAtualizacao = DateTime.Now;
+            rastreador.UltimaAtualizacao = DateTime.UtcNow;
             _context.Rastreadors.Add(rastreador);
             await _context.SaveChangesAsync();
             return Ok("Rastreador cadastrado com sucesso.");
@@ -64,7 +65,7 @@ namespace Rastreador.Controllers
             {
                 Latitude = latitude,
                 Longitude = longitude,
-                DataHora = DateTime.Now
+                DataHora = DateTime.UtcNow
             });
 
             await _context.SaveChangesAsync();

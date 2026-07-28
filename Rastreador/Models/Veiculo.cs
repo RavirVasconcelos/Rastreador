@@ -11,6 +11,7 @@ namespace Rastreador.Models
         public TipoVeiculo? TipoVeiculo { get; set; }
         public int? AnoVeiculo { get; set; }
         public string CpfProprietario { get; set; }
+        public DateTime DataCadastro { get; set; }
 
         public int ClienteId { get; set; }
         public Cliente? Cliente { get; set; }

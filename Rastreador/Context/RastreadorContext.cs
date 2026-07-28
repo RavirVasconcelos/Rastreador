@@ -20,6 +20,38 @@ namespace Rastreador.Context
         {
             base.OnModelCreating(modelBuilder);
 
+
+            // Datas de Cliente
+            modelBuilder.Entity<Cliente>()
+                .Property(c => c.DataNascimento)
+                .HasColumnType("timestamp without time zone");
+
+            modelBuilder.Entity<Cliente>()
+                .Property(c => c.DataCadastro)
+                .HasColumnType("timestamp with time zone");
+
+
+            // Datas de Veículo
+            modelBuilder.Entity<Veiculo>()
+                .Property(v => v.DataCadastro)
+                .HasColumnType("timestamp with time zone");
+
+
+            // Datas do Rastreador
+            modelBuilder.Entity<RastreadorModulo>()
+                .Property(r => r.DataCadastro)
+                .HasColumnType("timestamp with time zone");
+
+            modelBuilder.Entity<RastreadorModulo>()
+                .Property(r => r.UltimaAtualizacao)
+                .HasColumnType("timestamp with time zone");
+
+
+            // Datas das posições
+            modelBuilder.Entity<PosicaoVeiculo>()
+                .Property(p => p.DataHora)
+                .HasColumnType("timestamp with time zone");
+
             // Cliente -> Veículos (1:N)
             modelBuilder.Entity<Cliente>()
                 .HasMany(c => c.Veiculos)
