@@ -9,7 +9,5 @@
 
         public int RastreadorModuloId { get; set; }
         public RastreadorModulo? RastreadorModulo { get; set; }
-
-        public bool Ancorado { get; set; }
     }
 }

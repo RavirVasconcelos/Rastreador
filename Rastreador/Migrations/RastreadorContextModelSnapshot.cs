@@ -75,7 +75,7 @@ namespace Rastreador.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DataNascimento")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -102,9 +102,6 @@ namespace Rastreador.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PosicaoVeiculoId"));
 
-                    b.Property<bool>("Ancorado")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime>("DataHora")
                         .HasColumnType("timestamp with time zone");
 
@@ -119,7 +116,8 @@ namespace Rastreador.Migrations
 
                     b.HasKey("PosicaoVeiculoId");
 
-                    b.HasIndex("RastreadorModuloId");
+                    b.HasIndex("RastreadorModuloId")
+                        .IsUnique();
 
                     b.ToTable("PosicaoVeiculos");
                 });
@@ -138,9 +136,8 @@ namespace Rastreador.Migrations
                     b.Property<DateTime>("DataCadastro")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Identificador")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("Identificador")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Imei")
                         .IsRequired()
@@ -218,8 +215,8 @@ namespace Rastreador.Migrations
             modelBuilder.Entity("Rastreador.Models.PosicaoVeiculo", b =>
                 {
                     b.HasOne("Rastreador.Models.RastreadorModulo", "RastreadorModulo")
-                        .WithMany("Posicoes")
-                        .HasForeignKey("RastreadorModuloId")
+                        .WithOne("PosicaoAtual")
+                        .HasForeignKey("Rastreador.Models.PosicaoVeiculo", "RastreadorModuloId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -255,7 +252,7 @@ namespace Rastreador.Migrations
 
             modelBuilder.Entity("Rastreador.Models.RastreadorModulo", b =>
                 {
-                    b.Navigation("Posicoes");
+                    b.Navigation("PosicaoAtual");
                 });
 
             modelBuilder.Entity("Rastreador.Models.Veiculo", b =>

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Rastreador.Context;
+using Rastreador.DTOs;
 using Rastreador.Models;
 using Rastreador.Utils;
 
@@ -18,21 +19,148 @@ namespace Rastreador.Controllers
             _context = context;
         }
 
-        [HttpPost("CadastrarRastreador")]
-        public async Task<IActionResult> CadastrarRastreador(RastreadorModulo rastreador)
+        [HttpGet]
+        public async Task<IActionResult> GetRastreadores()
         {
-            var veiculoExistente = await _context.Veiculos.FindAsync(rastreador.VeiculoId);
+            var rastreadores = await _context.Rastreadors
+                                    .Include(v => v.Veiculo)
+                                    .Include(p => p.PosicaoAtual)
+                                    .Select(r => new RastreadorDTO
+                                    {
+                                        RastreadorId = r.RastreadorId,
+                                        Identificador = r.Identificador,
+                                        Imei = r.Imei,
+                                        NumeroChip = r.NumeroChip,
+                                        Ativo = r.Ativo,
+                                        ModoEconomia = r.ModoEconomia,
+                                        DataCadastro = r.DataCadastro,
+                                        UltimaAtualizacao = r.UltimaAtualizacao,
+
+
+                                        Veiculo = new VeiculoDTO
+                                        {
+                                            VeiculoId = r.VeiculoId,
+                                            Placa = r.Veiculo.Placa,
+                                            MarcaModelo = r.Veiculo.MarcaModelo,
+                                            TipoVeiculo = r.Veiculo.TipoVeiculo.ToString(),
+                                            AnoVeiculo = r.Veiculo.AnoVeiculo
+                                        },
+
+                                        PosicaoAtual = new PosicaoDTO
+                                        {
+                                            Latitude = r.PosicaoAtual.Latitude,
+                                            Longitude = r.PosicaoAtual.Longitude,
+                                            DataHora = r.PosicaoAtual.DataHora,
+                                            Ancorado = r.Veiculo.Ancoragem.Ativa
+                                        }
+                                    }).ToListAsync();
+
+            return Ok(rastreadores);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetRastreador(int id)
+        {
+            var rastreador = await _context.Rastreadors
+                                    .Include(v => v.Veiculo)
+                                    .Include(p => p.PosicaoAtual)
+                                    .Where(r => r.RastreadorId == id)
+                                    .Select(r => new RastreadorDTO
+                                    {
+                                        RastreadorId = r.RastreadorId,
+                                        Identificador = r.Identificador,
+                                        Imei = r.Imei,
+                                        NumeroChip = r.NumeroChip,
+                                        Ativo = r.Ativo,
+                                        ModoEconomia = r.ModoEconomia,
+                                        DataCadastro = r.DataCadastro,
+                                        UltimaAtualizacao = r.UltimaAtualizacao,
+
+
+                                        Veiculo = new VeiculoDTO
+                                        {
+                                            VeiculoId = r.VeiculoId,
+                                            Placa = r.Veiculo.Placa,
+                                            MarcaModelo = r.Veiculo.MarcaModelo,
+                                            TipoVeiculo = r.Veiculo.TipoVeiculo.ToString(),
+                                            AnoVeiculo = r.Veiculo.AnoVeiculo
+                                        },
+
+                                        PosicaoAtual = new PosicaoDTO
+                                        {
+                                            Latitude = r.PosicaoAtual.Latitude,
+                                            Longitude = r.PosicaoAtual.Longitude,
+                                            DataHora = r.PosicaoAtual.DataHora,
+                                            Ancorado = r.Veiculo.Ancoragem.Ativa
+                                        }
+                                    }).FirstOrDefaultAsync();
+
+            if (rastreador == null)
+                return NotFound();
+
+            return Ok(rastreador);
+        }
+
+        [HttpPost("CadastrarRastreador")]
+        public async Task<IActionResult> CadastrarRastreador(CadastrarRastreadorDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest("Dados inválidos");
+            }
+
+            var identificadorGuid = Guid.NewGuid();
+
+            var rastreadorExistente = await _context.Rastreadors.Where(r => r.Identificador == identificadorGuid && r.Imei == dto.Imei).FirstOrDefaultAsync();
+
+            if (rastreadorExistente != null)
+            {
+                return BadRequest("Rastreador já existente.");
+            }
+
+            dto.Placa = dto.Placa
+                        .Replace("-", "")
+                        .Replace(".", "")
+                        .Trim()
+                        .ToUpper();
+
+            var veiculoExistente = await _context.Veiculos.Where(v => v.Placa.ToUpper() == dto.Placa).FirstOrDefaultAsync();
 
             if (veiculoExistente == null)
             {
-                return BadRequest("Veículo não encontrado.");
+                return BadRequest("Veiculo não cadastrado.");
             }
 
-            rastreador.DataCadastro = DateTime.UtcNow;
-            rastreador.Ativo = true;
-            rastreador.ModoEconomia = false;
-            rastreador.UltimaAtualizacao = DateTime.UtcNow;
-            _context.Rastreadors.Add(rastreador);
+            var veiculoTemRastreador = await _context.Rastreadors.AnyAsync(r => r.VeiculoId == veiculoExistente.VeiculoId);
+
+            if (veiculoTemRastreador)
+            {
+                return BadRequest("Esse veículo já possui um rastreador.");
+            }
+
+            var novoRastreador = new RastreadorModulo
+            {
+                Identificador = identificadorGuid,
+                Imei = dto.Imei,
+                NumeroChip = dto.Chip,
+                VeiculoId = veiculoExistente.VeiculoId,
+                DataCadastro = DateTime.UtcNow,
+                Ativo = true,
+                ModoEconomia = false,
+                UltimaAtualizacao = DateTime.UtcNow
+            };
+
+            _context.Rastreadors.Add(novoRastreador);
+
+            _context.Ancoragems.Add(new Ancoragem
+            {
+                VeiculoId = veiculoExistente.VeiculoId,
+                Ativa = false,
+                Latitude = 0,
+                Longitude = 0,
+                RaioMetros = 300
+            });
+
             await _context.SaveChangesAsync();
             return Ok("Rastreador cadastrado com sucesso.");
         }
@@ -40,74 +168,113 @@ namespace Rastreador.Controllers
         [HttpGet("GetLocalizacaoAtual")]
         public async Task<IActionResult> GetLocalizacaoAtual(int veiculoId, double latitude, double longitude)
         {
-            var veiculoRastreado = await _context.Rastreadors
-                .Include(v => v.Veiculo)
-                .Include(p => p.Posicoes)
-                .FirstOrDefaultAsync(v => v.VeiculoId == veiculoId);
+            var rastreador = await _context.Rastreadors
+                .Include(r => r.Veiculo)
+                    .ThenInclude(v => v.Ancoragem)
+                .Include(r => r.PosicaoAtual)
+                .FirstOrDefaultAsync(r => r.VeiculoId == veiculoId);
 
-            if (veiculoRastreado == null)
+
+            if (rastreador == null)
             {
                 return BadRequest("Veículo não registrado.");
             }
 
-            var ultimaPosicao = veiculoRastreado.Posicoes.OrderByDescending(p => p.DataHora).FirstOrDefault();
 
-            if (!Calculos.VerificarSeEstarForaDaAncoragem(latitude, longitude, ultimaPosicao.Latitude, ultimaPosicao.Latitude, veiculoRastreado.Veiculo.Ancoragem.RaioMetros))
+            if (rastreador.PosicaoAtual == null)
             {
-                await EnviarMensagemDeAlerta(veiculoId);
-                return Ok(new
+                rastreador.PosicaoAtual = new PosicaoVeiculo
                 {
-                    LocalizacaoAtual = $"O veículo {veiculoRastreado.Veiculo.Placa} está fora da área de ancoragem. Enviando mensagem de alerta para o cliente."
-                });
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    DataHora = DateTime.UtcNow,
+                    RastreadorModuloId = rastreador.RastreadorId
+                };
+            }
+            else
+            {
+                rastreador.PosicaoAtual.Latitude = latitude;
+                rastreador.PosicaoAtual.Longitude = longitude;
+                rastreador.PosicaoAtual.DataHora = DateTime.UtcNow;
             }
 
-            veiculoRastreado.Posicoes.Add(new PosicaoVeiculo
+
+            if (rastreador.Veiculo.Ancoragem != null &&
+                rastreador.Veiculo.Ancoragem.Ativa)
             {
-                Latitude = latitude,
-                Longitude = longitude,
-                DataHora = DateTime.UtcNow
-            });
+                bool dentroDaAncoragem = Calculos.VerificarSeEstarForaDaAncoragem(
+                    latitude,
+                    longitude,
+                    rastreador.Veiculo.Ancoragem.Latitude,
+                    rastreador.Veiculo.Ancoragem.Longitude,
+                    rastreador.Veiculo.Ancoragem.RaioMetros
+                );
+
+
+                if (!dentroDaAncoragem)
+                {
+                    await EnviarMensagemDeAlerta(veiculoId);
+
+                    return Ok(new
+                    {
+                        LocalizacaoAtual = $"O veículo {rastreador.Veiculo.Placa} está fora da área de ancoragem."
+                    });
+                }
+            }
+
 
             await _context.SaveChangesAsync();
 
+
             return Ok(new
             {
-                LocalizacaoAtual = $"Localização atual do veículo {veiculoRastreado.Veiculo.Placa}: Latitude: {latitude}, Longitude: {longitude}"
+                LocalizacaoAtual = $"Localização atual do veículo {rastreador.Veiculo.Placa}",
+                Latitude = latitude,
+                Longitude = longitude
             });
         }
 
         [HttpPost("ColocarAncoragem")]
         public async Task<IActionResult> ColocarAncoragem(int veiculoId)
         {
-            var veiculoRastreado = await _context.Rastreadors
-                .Include(v => v.Veiculo)
-                .Include(p => p.Posicoes)
-                .Include(a => a.Veiculo.Ancoragem)
-                .FirstOrDefaultAsync(v => v.VeiculoId == veiculoId);
+            var rastreador = await _context.Rastreadors
+                .Include(r => r.Veiculo)
+                    .ThenInclude(v => v.Ancoragem)
+                .Include(r => r.PosicaoAtual)
+                .FirstOrDefaultAsync(r => r.VeiculoId == veiculoId);
 
-            if (veiculoRastreado == null)
+
+            if (rastreador == null)
             {
                 return BadRequest("Veículo não registrado.");
             }
 
-            if (veiculoRastreado.Veiculo.Ancoragem.Ativa == true)
+
+            if (rastreador.Veiculo.Ancoragem == null)
+            {
+                return BadRequest("Veículo não possui ancoragem cadastrada.");
+            }
+
+
+            if (rastreador.Veiculo.Ancoragem.Ativa)
             {
                 return BadRequest("Ancoragem já está ativa.");
             }
 
-            // Salvar localização atual com a ancoragem
-            var ultimaPosicao = veiculoRastreado.Posicoes.OrderByDescending(p => p.DataHora).FirstOrDefault();
 
-            if (ultimaPosicao != null)
+            if (rastreador.PosicaoAtual == null)
             {
-                ultimaPosicao.Ancorado = true;
-                veiculoRastreado.Veiculo.Ancoragem.Latitude = ultimaPosicao.Latitude;
-                veiculoRastreado.Veiculo.Ancoragem.Longitude = ultimaPosicao.Longitude;
-                veiculoRastreado.Veiculo.Ancoragem.Ativa = true;
+                return BadRequest("Veículo ainda não possui localização.");
             }
-            
-            await _context.AddAsync(veiculoRastreado);
+
+
+            rastreador.Veiculo.Ancoragem.Latitude = rastreador.PosicaoAtual.Latitude;
+            rastreador.Veiculo.Ancoragem.Longitude = rastreador.PosicaoAtual.Longitude;
+            rastreador.Veiculo.Ancoragem.Ativa = true;
+
+
             await _context.SaveChangesAsync();
+
 
             return Ok("Ancoragem ativada com sucesso.");
         }
@@ -115,32 +282,29 @@ namespace Rastreador.Controllers
         [HttpPost("RemoverAncoragem")]
         public async Task<IActionResult> RemoverAncoragem(int veiculoId)
         {
-            var veiculoRastreado = await _context.Rastreadors
-                .Include(v => v.Veiculo)
-                .Include(p => p.Posicoes)
-                .Include(a => a.Veiculo.Ancoragem)
-                .FirstOrDefaultAsync(v => v.VeiculoId == veiculoId);
+            var rastreador = await _context.Rastreadors
+                .Include(r => r.Veiculo)
+                    .ThenInclude(v => v.Ancoragem)
+                .FirstOrDefaultAsync(r => r.VeiculoId == veiculoId);
 
-            if (veiculoRastreado == null)
+
+            if (rastreador == null)
             {
                 return BadRequest("Veículo não registrado.");
             }
 
-            if (veiculoRastreado.Veiculo.Ancoragem.Ativa == false)
+
+            if (!rastreador.Veiculo.Ancoragem.Ativa)
             {
                 return BadRequest("Ancoragem já está desativada.");
             }
 
-            var posicaoAncorada = veiculoRastreado.Posicoes.OrderByDescending(p => p.DataHora).FirstOrDefault();
 
-            if (posicaoAncorada != null)
-            {
-                posicaoAncorada.Ancorado = false;
-                veiculoRastreado.Veiculo.Ancoragem.Ativa = false;
-            }
+            rastreador.Veiculo.Ancoragem.Ativa = false;
 
-            await _context.AddAsync(veiculoRastreado);
+
             await _context.SaveChangesAsync();
+
 
             return Ok("Ancoragem desativada com sucesso.");
         }
@@ -148,18 +312,24 @@ namespace Rastreador.Controllers
         [HttpGet("EnviarMensagemDeAlerta")]
         public async Task<IActionResult> EnviarMensagemDeAlerta(int veiculoId)
         {
-            var veiculoAncorado = await _context.Rastreadors
-                .Include(v => v.Veiculo)
-                .Include(p => p.Posicoes)
-                .Include(a => a.Veiculo.Ancoragem)
-                .Include(c => c.Veiculo.Cliente)
-                .FirstOrDefaultAsync(v => v.VeiculoId == veiculoId);
+            var rastreador = await _context.Rastreadors
+                .Include(r => r.Veiculo)
+                    .ThenInclude(v => v.Cliente)
+                .FirstOrDefaultAsync(r => r.VeiculoId == veiculoId);
 
-            var cliente = veiculoAncorado.Veiculo.Cliente.Nome;
+
+            if (rastreador == null)
+            {
+                return BadRequest("Veículo não encontrado.");
+            }
+
+
+            var cliente = rastreador.Veiculo.Cliente.Nome;
+
 
             return Ok(new
             {
-                EnviarMensagemDeAlerta = $"Alerta: Prezado cliente {cliente}, seu veículo saiu da área de ancoragem, por favor confirme se é você conduzindo o veículo."
+                Mensagem = $"Alerta: Prezado cliente {cliente}, seu veículo saiu da área de ancoragem, confirme se é você conduzindo o veículo."
             });
         }
     }

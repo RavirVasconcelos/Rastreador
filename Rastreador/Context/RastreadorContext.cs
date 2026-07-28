@@ -73,11 +73,15 @@ namespace Rastreador.Context
             modelBuilder.Entity<RastreadorModulo>()
                 .HasKey(r => r.RastreadorId);
 
-            // Rastreador -> Posições (1:N)
+            // Rastreador -> Posição Atual (1:1)
             modelBuilder.Entity<RastreadorModulo>()
-                .HasMany(r => r.Posicoes)
+                .HasOne(r => r.PosicaoAtual)
                 .WithOne(p => p.RastreadorModulo)
-                .HasForeignKey(p => p.RastreadorModuloId);
+                .HasForeignKey<PosicaoVeiculo>(p => p.RastreadorModuloId);
+
+            modelBuilder.Entity<PosicaoVeiculo>()
+                .HasIndex(p => p.RastreadorModuloId)
+                .IsUnique();
         }
     }
 }

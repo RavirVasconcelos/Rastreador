@@ -9,4 +9,13 @@ namespace Rastreador.DTOs
         public TipoVeiculo? TipoVeiculo { get; set; }
         public int? AnoVeiculo { get; set; }
     }
+
+    public class VeiculoDTO
+    {
+        public int VeiculoId { get; set; }
+        public string Placa { get; set; }
+        public string MarcaModelo { get; set; }
+        public string TipoVeiculo { get; set; }
+        public int? AnoVeiculo { get; set; }
+    }
 }
