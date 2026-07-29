@@ -24,4 +24,13 @@
 
         public PosicaoDTO PosicaoAtual { get; set; }
     }
+
+    public record RastreadorModoEconomiaResponse
+    {
+        public int RastreadorId { get; set; }
+        public string Placa { get; set; }
+        public string NomeCliente { get; set; }
+        public bool ModoEconomia { get; set; }
+        public int ConsumoReal { get; set; }
+    }
 }

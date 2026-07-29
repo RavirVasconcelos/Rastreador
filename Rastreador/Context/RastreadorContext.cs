@@ -15,6 +15,7 @@ namespace Rastreador.Context
         public DbSet<Veiculo> Veiculos { get; set; }
         public DbSet<PosicaoVeiculo> PosicaoVeiculos { get; set; }
         public DbSet<RastreadorModulo> Rastreadors { get; set; }
+        public DbSet<SonoRastreador> SonoRastreadors { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,6 +47,14 @@ namespace Rastreador.Context
                 .Property(r => r.UltimaAtualizacao)
                 .HasColumnType("timestamp with time zone");
 
+            // Datas do Sono
+            modelBuilder.Entity<SonoRastreador>()
+                .Property(s => s.HoraInicio)
+                .HasColumnType("timestamp with time zone");
+
+            modelBuilder.Entity<SonoRastreador>()
+                .Property(s => s.HoraFim)
+                .HasColumnType("timestamp with time zone");
 
             // Datas das posições
             modelBuilder.Entity<PosicaoVeiculo>()
@@ -79,9 +88,14 @@ namespace Rastreador.Context
                 .WithOne(p => p.RastreadorModulo)
                 .HasForeignKey<PosicaoVeiculo>(p => p.RastreadorModuloId);
 
-            modelBuilder.Entity<PosicaoVeiculo>()
-                .HasIndex(p => p.RastreadorModuloId)
-                .IsUnique();
+            // Rastreador -> Sono (1:1)
+            modelBuilder.Entity<RastreadorModulo>()
+                .HasOne(r => r.SonoRastreador)
+                .WithOne(s => s.Rastreador)
+                .HasForeignKey<SonoRastreador>(s => s.RastreadorId);
+
+            modelBuilder.Entity<SonoRastreador>()
+                .HasKey(s => s.SonoId);
         }
     }
 }

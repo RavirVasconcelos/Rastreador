@@ -18,5 +18,6 @@ namespace Rastreador.Models
 
         public RastreadorModulo? Rastreador { get; set; }
         public Ancoragem? Ancoragem { get; set; }
+        public SonoRastreador? SonoRastreador { get; set; }
     }
 }

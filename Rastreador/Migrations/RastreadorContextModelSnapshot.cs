@@ -164,6 +164,43 @@ namespace Rastreador.Migrations
                     b.ToTable("Rastreadors");
                 });
 
+            modelBuilder.Entity("Rastreador.Models.SonoRastreador", b =>
+                {
+                    b.Property<int>("SonoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SonoId"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("HoraFim")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("HoraInicio")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("RaioPerimetro")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("RastreadorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("SonoId");
+
+                    b.HasIndex("RastreadorId")
+                        .IsUnique();
+
+                    b.ToTable("SonoRastreadors");
+                });
+
             modelBuilder.Entity("Rastreador.Models.Veiculo", b =>
                 {
                     b.Property<int>("VeiculoId")
@@ -191,12 +228,17 @@ namespace Rastreador.Migrations
                     b.Property<string>("Placa")
                         .HasColumnType("text");
 
+                    b.Property<int?>("SonoRastreadorSonoId")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("TipoVeiculo")
                         .HasColumnType("integer");
 
                     b.HasKey("VeiculoId");
 
                     b.HasIndex("ClienteId");
+
+                    b.HasIndex("SonoRastreadorSonoId");
 
                     b.ToTable("Veiculos");
                 });
@@ -234,6 +276,17 @@ namespace Rastreador.Migrations
                     b.Navigation("Veiculo");
                 });
 
+            modelBuilder.Entity("Rastreador.Models.SonoRastreador", b =>
+                {
+                    b.HasOne("Rastreador.Models.RastreadorModulo", "Rastreador")
+                        .WithOne("SonoRastreador")
+                        .HasForeignKey("Rastreador.Models.SonoRastreador", "RastreadorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rastreador");
+                });
+
             modelBuilder.Entity("Rastreador.Models.Veiculo", b =>
                 {
                     b.HasOne("Rastreador.Models.Cliente", "Cliente")
@@ -242,7 +295,13 @@ namespace Rastreador.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Rastreador.Models.SonoRastreador", "SonoRastreador")
+                        .WithMany()
+                        .HasForeignKey("SonoRastreadorSonoId");
+
                     b.Navigation("Cliente");
+
+                    b.Navigation("SonoRastreador");
                 });
 
             modelBuilder.Entity("Rastreador.Models.Cliente", b =>
@@ -253,6 +312,8 @@ namespace Rastreador.Migrations
             modelBuilder.Entity("Rastreador.Models.RastreadorModulo", b =>
                 {
                     b.Navigation("PosicaoAtual");
+
+                    b.Navigation("SonoRastreador");
                 });
 
             modelBuilder.Entity("Rastreador.Models.Veiculo", b =>

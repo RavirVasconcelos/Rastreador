@@ -19,5 +19,6 @@
         public Veiculo? Veiculo { get; set; }
 
         public PosicaoVeiculo? PosicaoAtual { get; set; }
+        public SonoRastreador? SonoRastreador { get; set; }
     }
 }

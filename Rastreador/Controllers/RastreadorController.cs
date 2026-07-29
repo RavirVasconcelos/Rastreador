@@ -5,6 +5,7 @@ using Rastreador.Context;
 using Rastreador.DTOs;
 using Rastreador.Models;
 using Rastreador.Utils;
+using System.Runtime.InteropServices;
 
 namespace Rastreador.Controllers
 {
@@ -23,37 +24,37 @@ namespace Rastreador.Controllers
         public async Task<IActionResult> GetRastreadores()
         {
             var rastreadores = await _context.Rastreadors
-                                    .Include(v => v.Veiculo)
-                                    .Include(p => p.PosicaoAtual)
-                                    .Select(r => new RastreadorDTO
-                                    {
-                                        RastreadorId = r.RastreadorId,
-                                        Identificador = r.Identificador,
-                                        Imei = r.Imei,
-                                        NumeroChip = r.NumeroChip,
-                                        Ativo = r.Ativo,
-                                        ModoEconomia = r.ModoEconomia,
-                                        DataCadastro = r.DataCadastro,
-                                        UltimaAtualizacao = r.UltimaAtualizacao,
+                                      .Include(r => r.Veiculo)
+                                      .Include(r => r.PosicaoAtual)
+                                      .Select(r => new RastreadorDTO
+                                      {
+                                          RastreadorId = r.RastreadorId,
+                                          Identificador = r.Identificador,
+                                          Imei = r.Imei,
+                                          NumeroChip = r.NumeroChip,
+                                          Ativo = r.Ativo,
+                                          ModoEconomia = r.ModoEconomia,
+                                          DataCadastro = r.DataCadastro,
+                                          UltimaAtualizacao = r.UltimaAtualizacao,
 
+                                          Veiculo = new VeiculoDTO
+                                          {
+                                              VeiculoId = r.VeiculoId,
+                                              Placa = r.Veiculo.Placa,
+                                              MarcaModelo = r.Veiculo.MarcaModelo,
+                                              TipoVeiculo = r.Veiculo.TipoVeiculo.ToString(),
+                                              AnoVeiculo = r.Veiculo.AnoVeiculo
+                                          },
 
-                                        Veiculo = new VeiculoDTO
-                                        {
-                                            VeiculoId = r.VeiculoId,
-                                            Placa = r.Veiculo.Placa,
-                                            MarcaModelo = r.Veiculo.MarcaModelo,
-                                            TipoVeiculo = r.Veiculo.TipoVeiculo.ToString(),
-                                            AnoVeiculo = r.Veiculo.AnoVeiculo
-                                        },
-
-                                        PosicaoAtual = new PosicaoDTO
-                                        {
-                                            Latitude = r.PosicaoAtual.Latitude,
-                                            Longitude = r.PosicaoAtual.Longitude,
-                                            DataHora = r.PosicaoAtual.DataHora,
-                                            Ancorado = r.Veiculo.Ancoragem.Ativa
-                                        }
-                                    }).ToListAsync();
+                                          PosicaoAtual = new PosicaoDTO
+                                          {
+                                                Latitude = r.PosicaoAtual.Latitude,
+                                                Longitude = r.PosicaoAtual.Longitude,
+                                                DataHora = r.PosicaoAtual.DataHora,
+                                                Ancorado = r.Veiculo.Ancoragem.Ativa
+                                          }
+                                      })
+                                      .ToListAsync();
 
             return Ok(rastreadores);
         }
@@ -307,6 +308,122 @@ namespace Rastreador.Controllers
 
 
             return Ok("Ancoragem desativada com sucesso.");
+        }
+
+        [HttpGet("VerificarAncoragem")]
+        public async Task<IActionResult> VerificarAncoragem(int veiculoId)
+        {
+            var rastreador = await _context.Rastreadors
+                .Include(r => r.Veiculo)
+                    .ThenInclude(v => v.Ancoragem)
+                .FirstOrDefaultAsync(r => r.VeiculoId == veiculoId);
+
+            
+            if (rastreador == null)
+            {
+                return BadRequest("Veículo não registrado.");
+            }
+
+
+            if (rastreador.Veiculo.Ancoragem == null)
+            {
+                return BadRequest("Veículo não possui ancoragem cadastrada.");
+            }
+
+
+            return Ok(new
+            {
+                AncoragemAtiva = rastreador.Veiculo.Ancoragem.Ativa
+            });
+        }
+
+        [HttpPost("DefinirModoSono")]
+        public async Task<IActionResult> DefinirModoSono(DefinirModoSonoDTO dto)
+        {
+            var veiculoExistente = await _context.Veiculos.Where(v => v.Placa == dto.Placa).FirstOrDefaultAsync();
+            var identificadorRastreador = await _context.Rastreadors.Where(r => r.Identificador == dto.IdentificadorRastreador).FirstOrDefaultAsync();
+
+            if (veiculoExistente == null || identificadorRastreador == null)
+            {
+                return BadRequest("Veículo ou rastreador não encontrados.");
+            }
+
+            var definirSono = new SonoRastreador
+            {
+                HoraInicio = dto.HoraInicio,
+                HoraFim = dto.HoraFim,
+                Latitude = dto.Latitude,
+                Longitude = dto.Longitude,
+                Ativo = false,
+                RastreadorId = identificadorRastreador.RastreadorId
+            };
+
+            _context.SonoRastreadors.Add(definirSono);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                Mensagem = $"Modo Sono Definido com sucesso. Horário de inicio: {dto.HoraFim} , Horário de Fim: {dto.HoraFim}"
+            });
+        }
+
+        [HttpPost("AtivarModoSono")]
+        public async Task<IActionResult> AtivarModoSono(Guid identificadorRastreador, double latitude, double longitude)
+        {
+            var rastreador = await _context.Rastreadors
+                .Include(s => s.SonoRastreador)
+                .Where(r => r.Identificador == identificadorRastreador).FirstOrDefaultAsync();
+
+            if (rastreador == null)
+            {
+                return BadRequest("Rastreador não cadastrado.");
+            }
+
+            if (rastreador.SonoRastreador == null)
+            {
+                return BadRequest("Modo sono não foi configurado ainda.");
+            }
+
+            var agora = DateTime.Now.TimeOfDay;
+
+            var inicio = rastreador.SonoRastreador.HoraInicio.Value.TimeOfDay;
+            var fim = rastreador.SonoRastreador.HoraFim.Value.TimeOfDay;
+
+            bool dentroHorario;
+
+            if (inicio < fim)
+            {
+                dentroHorario = agora >= inicio && agora <= fim;
+            }
+            else
+            {
+                dentroHorario = agora >= inicio || agora <= fim;
+            }
+
+            if (!dentroHorario)
+            {
+                return BadRequest("Fora do horário configurado para o modo sono.");
+            }
+
+            bool dentroDoPerimetro = Calculos.VerificarSeEstarForaDaAncoragem(
+                                                    latitude,
+                                                    longitude,
+                                                    rastreador.SonoRastreador.Latitude,
+                                                    rastreador.SonoRastreador.Longitude,
+                                                    rastreador.SonoRastreador.RaioPerimetro
+                                                );
+
+            if (!dentroDoPerimetro)
+            {
+                return BadRequest("O veículo não está no local configurado para ativar o modo sono.");
+            }
+
+
+            rastreador.SonoRastreador.Ativo = true;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Modo sono ativado com sucesso.");
         }
 
         [HttpGet("EnviarMensagemDeAlerta")]
