@@ -4,8 +4,8 @@
     {
         public int SonoId { get; set; }
 
-        public DateTime? HoraInicio { get; set; }
-        public DateTime? HoraFim { get; set; }
+        public TimeOnly HoraInicio { get; set; }
+        public TimeOnly HoraFim { get; set; }
 
         //Configurar no local onde o rastreador está dormindo, para que quando ele acordar, ele retorne para o local onde estava.
         public double Latitude { get; set; }

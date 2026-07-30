@@ -105,6 +105,12 @@ namespace Rastreador.Migrations
                     b.Property<DateTime>("DataHora")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<double?>("DirecaoGraus")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("integer");
+
                     b.Property<double>("Latitude")
                         .HasColumnType("double precision");
 
@@ -113,6 +119,9 @@ namespace Rastreador.Migrations
 
                     b.Property<int>("RastreadorModuloId")
                         .HasColumnType("integer");
+
+                    b.Property<double>("VelocidadeKmH")
+                        .HasColumnType("double precision");
 
                     b.HasKey("PosicaoVeiculoId");
 
@@ -175,11 +184,11 @@ namespace Rastreador.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("HoraFim")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<TimeOnly>("HoraFim")
+                        .HasColumnType("time without time zone");
 
-                    b.Property<DateTime?>("HoraInicio")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<TimeOnly>("HoraInicio")
+                        .HasColumnType("time without time zone");
 
                     b.Property<double>("Latitude")
                         .HasColumnType("double precision");

@@ -50,11 +50,11 @@ namespace Rastreador.Context
             // Datas do Sono
             modelBuilder.Entity<SonoRastreador>()
                 .Property(s => s.HoraInicio)
-                .HasColumnType("timestamp with time zone");
+                .HasColumnType("time without time zone");
 
             modelBuilder.Entity<SonoRastreador>()
                 .Property(s => s.HoraFim)
-                .HasColumnType("timestamp with time zone");
+                .HasColumnType("time without time zone");
 
             // Datas das posições
             modelBuilder.Entity<PosicaoVeiculo>()

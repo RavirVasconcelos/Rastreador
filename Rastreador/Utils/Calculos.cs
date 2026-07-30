@@ -39,5 +39,29 @@ namespace Rastreador.Utils
                 return true; // Dentro da ancoragem
             }
         }
+
+        public static double CalcularDistanciaEmMetros(double latitudeAnterior, double longitudeAnterior, double latitudeAtual, double longitudeAtual)
+        {
+            const double raioTerra = 6371000;
+
+            double dLat = GrausParaRad(latitudeAtual - latitudeAnterior);
+            double dLon = GrausParaRad(longitudeAtual - longitudeAnterior);
+
+            double a =
+                Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                Math.Cos(GrausParaRad(latitudeAnterior)) *
+                Math.Cos(GrausParaRad(latitudeAtual)) *
+                Math.Sin(dLon / 2) *
+                Math.Sin(dLon / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            return raioTerra * c;
+        }
+
+        private static double GrausParaRad(double graus)
+        {
+            return graus * (Math.PI / 180);
+        }
     }
 }
