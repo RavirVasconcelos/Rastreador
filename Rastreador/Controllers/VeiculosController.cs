@@ -48,7 +48,7 @@ namespace Rastreador.Controllers
                 AnoVeiculo = dto.AnoVeiculo,
                 ClienteId = usuarioLogadoId,
                 CpfProprietario = usuarioLogadoCpf,
-                DataCadastro = DateTime.UtcNow
+                DataCadastro = DateTime.Now
             };
 
 

@@ -172,10 +172,10 @@ namespace Rastreador.Controllers
                 Imei = dto.Imei,
                 NumeroChip = dto.Chip,
                 VeiculoId = veiculoExistente.VeiculoId,
-                DataCadastro = DateTime.UtcNow,
+                DataCadastro = DateTime.Now,
                 Ativo = true,
                 ModoEconomia = false,
-                UltimaAtualizacao = DateTime.UtcNow
+                UltimaAtualizacao = DateTime.Now
             };
 
             _context.Rastreadors.Add(novoRastreador);
@@ -403,7 +403,7 @@ namespace Rastreador.Controllers
                 return BadRequest("Veículo não registrado.");
             }
 
-            var agora = DateTime.UtcNow;
+            var agora = DateTime.Now;
 
             if (rastreador.PosicaoAtual == null)
             {
@@ -503,7 +503,7 @@ namespace Rastreador.Controllers
                 return BadRequest("Modo sono já está ativado.");
             }
 
-            var agora = TimeOnly.FromDateTime(DateTime.Parse("22:09:00"));
+            var agora = TimeOnly.FromDateTime(DateTime.Now);
 
             var inicio = rastreador.SonoRastreador.HoraInicio;
             var fim = rastreador.SonoRastreador.HoraFim;
@@ -567,7 +567,7 @@ namespace Rastreador.Controllers
                 return BadRequest("Modo sono já está desativado.");
             }
 
-            var agora = TimeOnly.FromDateTime(DateTime.Parse("05:05:00"));
+            var agora = TimeOnly.FromDateTime(DateTime.Now);
 
             var inicio = rastreador.SonoRastreador.HoraInicio;
             var fim = rastreador.SonoRastreador.HoraFim;

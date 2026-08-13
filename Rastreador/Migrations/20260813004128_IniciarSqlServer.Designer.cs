@@ -2,9 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Rastreador.Context;
 
 #nullable disable
@@ -12,8 +12,8 @@ using Rastreador.Context;
 namespace Rastreador.Migrations
 {
     [DbContext(typeof(RastreadorContext))]
-    [Migration("20260728145517_AjustePosicao")]
-    partial class AjustePosicao
+    [Migration("20260813004128_IniciarSqlServer")]
+    partial class IniciarSqlServer
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,38 +21,38 @@ namespace Rastreador.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Rastreador.Models.Ancoragem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Ativa")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<TimeOnly?>("HoraFim")
-                        .HasColumnType("time without time zone");
+                        .HasColumnType("time");
 
                     b.Property<TimeOnly?>("HoraInicio")
-                        .HasColumnType("time without time zone");
+                        .HasColumnType("time");
 
                     b.Property<double>("Latitude")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<double>("Longitude")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<double>("RaioMetros")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<int>("VeiculoId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -66,31 +66,31 @@ namespace Rastreador.Migrations
                 {
                     b.Property<int>("ClienteId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClienteId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClienteId"));
 
                     b.Property<string>("Cpf")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DataNascimento")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Senha")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ClienteId");
 
@@ -101,21 +101,30 @@ namespace Rastreador.Migrations
                 {
                     b.Property<int>("PosicaoVeiculoId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PosicaoVeiculoId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PosicaoVeiculoId"));
 
                     b.Property<DateTime>("DataHora")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("DirecaoGraus")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("int");
 
                     b.Property<double>("Latitude")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<double>("Longitude")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<int>("RastreadorModuloId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
+
+                    b.Property<double>("VelocidadeKmH")
+                        .HasColumnType("float");
 
                     b.HasKey("PosicaoVeiculoId");
 
@@ -129,35 +138,35 @@ namespace Rastreador.Migrations
                 {
                     b.Property<int>("RastreadorId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RastreadorId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RastreadorId"));
 
                     b.Property<bool>("Ativo")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("Identificador")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Imei")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("ModoEconomia")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<string>("NumeroChip")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UltimaAtualizacao")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("VeiculoId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.HasKey("RastreadorId");
 
@@ -167,39 +176,81 @@ namespace Rastreador.Migrations
                     b.ToTable("Rastreadors");
                 });
 
+            modelBuilder.Entity("Rastreador.Models.SonoRastreador", b =>
+                {
+                    b.Property<int>("SonoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SonoId"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("HoraFim")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("HoraInicio")
+                        .HasColumnType("time");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("RaioPerimetro")
+                        .HasColumnType("float");
+
+                    b.Property<int>("RastreadorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SonoId");
+
+                    b.HasIndex("RastreadorId")
+                        .IsUnique();
+
+                    b.ToTable("SonoRastreadors");
+                });
+
             modelBuilder.Entity("Rastreador.Models.Veiculo", b =>
                 {
                     b.Property<int>("VeiculoId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("VeiculoId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VeiculoId"));
 
                     b.Property<int?>("AnoVeiculo")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int>("ClienteId")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<string>("CpfProprietario")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("MarcaModelo")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Placa")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SonoRastreadorSonoId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("TipoVeiculo")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.HasKey("VeiculoId");
 
                     b.HasIndex("ClienteId");
+
+                    b.HasIndex("SonoRastreadorSonoId");
 
                     b.ToTable("Veiculos");
                 });
@@ -237,6 +288,17 @@ namespace Rastreador.Migrations
                     b.Navigation("Veiculo");
                 });
 
+            modelBuilder.Entity("Rastreador.Models.SonoRastreador", b =>
+                {
+                    b.HasOne("Rastreador.Models.RastreadorModulo", "Rastreador")
+                        .WithOne("SonoRastreador")
+                        .HasForeignKey("Rastreador.Models.SonoRastreador", "RastreadorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rastreador");
+                });
+
             modelBuilder.Entity("Rastreador.Models.Veiculo", b =>
                 {
                     b.HasOne("Rastreador.Models.Cliente", "Cliente")
@@ -245,7 +307,13 @@ namespace Rastreador.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Rastreador.Models.SonoRastreador", "SonoRastreador")
+                        .WithMany()
+                        .HasForeignKey("SonoRastreadorSonoId");
+
                     b.Navigation("Cliente");
+
+                    b.Navigation("SonoRastreador");
                 });
 
             modelBuilder.Entity("Rastreador.Models.Cliente", b =>
@@ -256,6 +324,8 @@ namespace Rastreador.Migrations
             modelBuilder.Entity("Rastreador.Models.RastreadorModulo", b =>
                 {
                     b.Navigation("PosicaoAtual");
+
+                    b.Navigation("SonoRastreador");
                 });
 
             modelBuilder.Entity("Rastreador.Models.Veiculo", b =>
