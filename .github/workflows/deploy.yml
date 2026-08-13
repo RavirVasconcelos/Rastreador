@@ -1,0 +1,47 @@
+name: Deploy para o Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  SERVICE_NAME: rastreador-api
+  REPO_NAME: rastreador
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do Código
+      uses: actions/checkout@v3
+
+    - name: Autenticar no Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Configurar gcloud CLI
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Autenticar Docker no Artifact Registry
+      run: |
+        gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+    - name: Build e Push da Imagem Docker
+      run: |
+        IMAGE_TAG="us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/rastreador:${{ github.sha }}"
+        docker build -t $IMAGE_TAG .
+        docker push $IMAGE_TAG
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+    - name: Deploy no Cloud Run
+      run: |
+        gcloud run deploy $SERVICE_NAME \
+          --image us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/rastreador:${{ github.sha }} \
+          --region $REGION \
+          --platform managed \
+          --allow-unauthenticated
