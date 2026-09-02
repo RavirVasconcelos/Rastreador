@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Rastreador.Migrations
 {
     /// <inheritdoc />
-    public partial class IniciarSqlServer : Migration
+    public partial class InitialPostgres : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,14 +16,14 @@ namespace Rastreador.Migrations
                 name: "Clientes",
                 columns: table => new
                 {
-                    ClienteId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Senha = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Cpf = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DataNascimento = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DataCadastro = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ClienteId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Senha = table.Column<string>(type: "text", nullable: false),
+                    Cpf = table.Column<string>(type: "text", nullable: false),
+                    DataNascimento = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -33,15 +34,15 @@ namespace Rastreador.Migrations
                 name: "Ancoragems",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Latitude = table.Column<double>(type: "float", nullable: false),
-                    Longitude = table.Column<double>(type: "float", nullable: false),
-                    RaioMetros = table.Column<double>(type: "float", nullable: false),
-                    Ativa = table.Column<bool>(type: "bit", nullable: false),
-                    HoraInicio = table.Column<TimeOnly>(type: "time", nullable: true),
-                    HoraFim = table.Column<TimeOnly>(type: "time", nullable: true),
-                    VeiculoId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Latitude = table.Column<double>(type: "double precision", nullable: false),
+                    Longitude = table.Column<double>(type: "double precision", nullable: false),
+                    RaioMetros = table.Column<double>(type: "double precision", nullable: false),
+                    Ativa = table.Column<bool>(type: "boolean", nullable: false),
+                    HoraInicio = table.Column<TimeOnly>(type: "time without time zone", nullable: true),
+                    HoraFim = table.Column<TimeOnly>(type: "time without time zone", nullable: true),
+                    VeiculoId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -52,15 +53,15 @@ namespace Rastreador.Migrations
                 name: "PosicaoVeiculos",
                 columns: table => new
                 {
-                    PosicaoVeiculoId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Latitude = table.Column<double>(type: "float", nullable: false),
-                    Longitude = table.Column<double>(type: "float", nullable: false),
-                    VelocidadeKmH = table.Column<double>(type: "float", nullable: false),
-                    DirecaoGraus = table.Column<double>(type: "float", nullable: true),
-                    Estado = table.Column<int>(type: "int", nullable: false),
-                    DataHora = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RastreadorModuloId = table.Column<int>(type: "int", nullable: false)
+                    PosicaoVeiculoId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Latitude = table.Column<double>(type: "double precision", nullable: false),
+                    Longitude = table.Column<double>(type: "double precision", nullable: false),
+                    VelocidadeKmH = table.Column<double>(type: "double precision", nullable: false),
+                    DirecaoGraus = table.Column<double>(type: "double precision", nullable: true),
+                    Estado = table.Column<int>(type: "integer", nullable: false),
+                    DataHora = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RastreadorModuloId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -71,16 +72,16 @@ namespace Rastreador.Migrations
                 name: "Rastreadors",
                 columns: table => new
                 {
-                    RastreadorId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Identificador = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Imei = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NumeroChip = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DataCadastro = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Ativo = table.Column<bool>(type: "bit", nullable: false),
-                    ModoEconomia = table.Column<bool>(type: "bit", nullable: false),
-                    UltimaAtualizacao = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    VeiculoId = table.Column<int>(type: "int", nullable: false)
+                    RastreadorId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Identificador = table.Column<Guid>(type: "uuid", nullable: false),
+                    Imei = table.Column<string>(type: "text", nullable: false),
+                    NumeroChip = table.Column<string>(type: "text", nullable: false),
+                    DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    ModoEconomia = table.Column<bool>(type: "boolean", nullable: false),
+                    UltimaAtualizacao = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    VeiculoId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -91,15 +92,15 @@ namespace Rastreador.Migrations
                 name: "SonoRastreadors",
                 columns: table => new
                 {
-                    SonoId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    HoraInicio = table.Column<TimeOnly>(type: "time", nullable: false),
-                    HoraFim = table.Column<TimeOnly>(type: "time", nullable: false),
-                    Latitude = table.Column<double>(type: "float", nullable: false),
-                    Longitude = table.Column<double>(type: "float", nullable: false),
-                    RaioPerimetro = table.Column<double>(type: "float", nullable: false),
-                    Ativo = table.Column<bool>(type: "bit", nullable: false),
-                    RastreadorId = table.Column<int>(type: "int", nullable: false)
+                    SonoId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    HoraInicio = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    HoraFim = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    Latitude = table.Column<double>(type: "double precision", nullable: false),
+                    Longitude = table.Column<double>(type: "double precision", nullable: false),
+                    RaioPerimetro = table.Column<double>(type: "double precision", nullable: false),
+                    Ativo = table.Column<bool>(type: "boolean", nullable: false),
+                    RastreadorId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,16 +117,16 @@ namespace Rastreador.Migrations
                 name: "Veiculos",
                 columns: table => new
                 {
-                    VeiculoId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Placa = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MarcaModelo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TipoVeiculo = table.Column<int>(type: "int", nullable: true),
-                    AnoVeiculo = table.Column<int>(type: "int", nullable: true),
-                    CpfProprietario = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DataCadastro = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClienteId = table.Column<int>(type: "int", nullable: false),
-                    SonoRastreadorSonoId = table.Column<int>(type: "int", nullable: true)
+                    VeiculoId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Placa = table.Column<string>(type: "text", nullable: true),
+                    MarcaModelo = table.Column<string>(type: "text", nullable: true),
+                    TipoVeiculo = table.Column<int>(type: "integer", nullable: true),
+                    AnoVeiculo = table.Column<int>(type: "integer", nullable: true),
+                    CpfProprietario = table.Column<string>(type: "text", nullable: false),
+                    DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ClienteId = table.Column<int>(type: "integer", nullable: false),
+                    SonoRastreadorSonoId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
