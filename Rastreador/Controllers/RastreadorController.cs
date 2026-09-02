@@ -81,6 +81,8 @@ namespace Rastreador.Controllers
                             Latitude = r.PosicaoAtual.Latitude,
                             Longitude = r.PosicaoAtual.Longitude,
                             DataHora = r.PosicaoAtual.DataHora,
+                            Velocidade = r.PosicaoAtual.VelocidadeKmH,
+
                             Ancorado = r.Veiculo.Ancoragem != null &&
                                        r.Veiculo.Ancoragem.Ativa
                         }
@@ -125,6 +127,7 @@ namespace Rastreador.Controllers
                             Latitude = r.PosicaoAtual.Latitude,
                             Longitude = r.PosicaoAtual.Longitude,
                             DataHora = r.PosicaoAtual.DataHora,
+                            Velocidade = r.PosicaoAtual.VelocidadeKmH,
 
                             Ancorado = r.Veiculo.Ancoragem != null &&
                                        r.Veiculo.Ancoragem.Ativa
