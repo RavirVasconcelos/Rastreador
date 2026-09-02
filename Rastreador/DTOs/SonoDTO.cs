@@ -1,6 +1,16 @@
 ﻿namespace Rastreador.DTOs
 {
 
+    public record SonoDTO
+    {
+        public TimeOnly HoraInicio { get; set; }
+        public TimeOnly HoraFim { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public double RaioPerimetro { get; set; }
+        public bool Ativo { get; set; }
+    }
+
     public record DefinirModoSonoDTO
     {
         public TimeOnly HoraInicio { get; set; }

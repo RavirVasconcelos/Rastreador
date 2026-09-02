@@ -23,6 +23,8 @@
         public VeiculoDTO Veiculo { get; set; }
 
         public PosicaoDTO PosicaoAtual { get; set; }
+
+        public SonoDTO ModoSono { get; set; }
     }
 
     public record RastreadorModoEconomiaResponse

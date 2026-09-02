@@ -85,6 +85,18 @@ namespace Rastreador.Controllers
 
                             Ancorado = r.Veiculo.Ancoragem != null &&
                                        r.Veiculo.Ancoragem.Ativa
+                        },
+
+                    ModoSono = r.SonoRastreador == null
+                        ? null
+                        : new SonoDTO
+                        {
+                            HoraInicio = r.SonoRastreador.HoraInicio,
+                            HoraFim = r.SonoRastreador.HoraFim,
+                            Latitude = r.SonoRastreador.Latitude,
+                            Longitude = r.SonoRastreador.Longitude,
+                            RaioPerimetro = r.SonoRastreador.RaioPerimetro,
+                            Ativo = r.SonoRastreador.Ativo
                         }
                 })
                 .ToListAsync();
@@ -131,6 +143,18 @@ namespace Rastreador.Controllers
 
                             Ancorado = r.Veiculo.Ancoragem != null &&
                                        r.Veiculo.Ancoragem.Ativa
+                        },
+
+                    ModoSono = r.SonoRastreador == null
+                        ? null
+                        : new SonoDTO
+                        {
+                            HoraInicio = r.SonoRastreador.HoraInicio,
+                            HoraFim = r.SonoRastreador.HoraFim,
+                            Latitude = r.SonoRastreador.Latitude,
+                            Longitude = r.SonoRastreador.Longitude,
+                            RaioPerimetro = r.SonoRastreador.RaioPerimetro,
+                            Ativo = r.SonoRastreador.Ativo
                         }
                 })
                 .FirstOrDefaultAsync();
