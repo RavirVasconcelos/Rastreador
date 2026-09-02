@@ -420,6 +420,30 @@ namespace Rastreador.Controllers
             return Ok("Localização do Modo Sono alterada com sucesso.");
         }
 
+        [HttpPost("DesativarModoSonoMobile")]
+        public async Task<IActionResult> DesativarModoSonoMobile(Guid identificadorRastreador)
+        {
+            var usuarioLogado = User.Claims.FirstOrDefault(c => c.Type == "Cpf")?.Value;
+            var rastreador = await _context.Rastreadors
+                .Include(r => r.SonoRastreador)
+                .Where(r => r.Identificador == identificadorRastreador && r.Veiculo.CpfProprietario == usuarioLogado)
+                .FirstOrDefaultAsync();
+
+            if (rastreador == null)
+            {
+                return BadRequest("Rastreador não cadastrado.");
+            }
+
+            if (rastreador.SonoRastreador == null)
+            {
+                return BadRequest("Modo sono ainda não configurado.");
+            }
+
+            rastreador.SonoRastreador.Ativo = false;
+            await _context.SaveChangesAsync();
+            return Ok("Modo sono desativado com sucesso.");
+        }
+
         #endregion
 
         #region RASTREADOR
