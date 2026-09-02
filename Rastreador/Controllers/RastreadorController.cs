@@ -51,37 +51,41 @@ namespace Rastreador.Controllers
         public async Task<IActionResult> GetRastreadores()
         {
             var rastreadores = await _context.Rastreadors
-                                      .Include(r => r.Veiculo)
-                                      .Include(r => r.PosicaoAtual)
-                                      .Select(r => new RastreadorDTO
-                                      {
-                                          RastreadorId = r.RastreadorId,
-                                          Identificador = r.Identificador,
-                                          Imei = r.Imei,
-                                          NumeroChip = r.NumeroChip,
-                                          Ativo = r.Ativo,
-                                          ModoEconomia = r.ModoEconomia,
-                                          DataCadastro = r.DataCadastro,
-                                          UltimaAtualizacao = r.UltimaAtualizacao,
+                .Include(r => r.Veiculo)
+                    .ThenInclude(v => v.Ancoragem)
+                .Include(r => r.PosicaoAtual)
+                .Select(r => new RastreadorDTO
+                {
+                    RastreadorId = r.RastreadorId,
+                    Identificador = r.Identificador,
+                    Imei = r.Imei,
+                    NumeroChip = r.NumeroChip,
+                    Ativo = r.Ativo,
+                    ModoEconomia = r.ModoEconomia,
+                    DataCadastro = r.DataCadastro,
+                    UltimaAtualizacao = r.UltimaAtualizacao,
 
-                                          Veiculo = new VeiculoDTO
-                                          {
-                                              VeiculoId = r.VeiculoId,
-                                              Placa = r.Veiculo.Placa,
-                                              MarcaModelo = r.Veiculo.MarcaModelo,
-                                              TipoVeiculo = r.Veiculo.TipoVeiculo.ToString(),
-                                              AnoVeiculo = r.Veiculo.AnoVeiculo
-                                          },
+                    Veiculo = new VeiculoDTO
+                    {
+                        VeiculoId = r.VeiculoId,
+                        Placa = r.Veiculo.Placa,
+                        MarcaModelo = r.Veiculo.MarcaModelo,
+                        TipoVeiculo = r.Veiculo.TipoVeiculo.ToString(),
+                        AnoVeiculo = r.Veiculo.AnoVeiculo
+                    },
 
-                                          PosicaoAtual = new PosicaoDTO
-                                          {
-                                              Latitude = r.PosicaoAtual.Latitude,
-                                              Longitude = r.PosicaoAtual.Longitude,
-                                              DataHora = r.PosicaoAtual.DataHora,
-                                              Ancorado = r.Veiculo.Ancoragem.Ativa
-                                          }
-                                      })
-                                      .ToListAsync();
+                    PosicaoAtual = r.PosicaoAtual == null
+                        ? null
+                        : new PosicaoDTO
+                        {
+                            Latitude = r.PosicaoAtual.Latitude,
+                            Longitude = r.PosicaoAtual.Longitude,
+                            DataHora = r.PosicaoAtual.DataHora,
+                            Ancorado = r.Veiculo.Ancoragem != null &&
+                                       r.Veiculo.Ancoragem.Ativa
+                        }
+                })
+                .ToListAsync();
 
             return Ok(rastreadores);
         }
@@ -90,38 +94,43 @@ namespace Rastreador.Controllers
         public async Task<IActionResult> GetRastreador(int id)
         {
             var rastreador = await _context.Rastreadors
-                                    .Include(v => v.Veiculo)
-                                    .Include(p => p.PosicaoAtual)
-                                    .Where(r => r.RastreadorId == id)
-                                    .Select(r => new RastreadorDTO
-                                    {
-                                        RastreadorId = r.RastreadorId,
-                                        Identificador = r.Identificador,
-                                        Imei = r.Imei,
-                                        NumeroChip = r.NumeroChip,
-                                        Ativo = r.Ativo,
-                                        ModoEconomia = r.ModoEconomia,
-                                        DataCadastro = r.DataCadastro,
-                                        UltimaAtualizacao = r.UltimaAtualizacao,
+                .Include(r => r.Veiculo)
+                    .ThenInclude(v => v.Ancoragem)
+                .Include(r => r.PosicaoAtual)
+                .Where(r => r.RastreadorId == id)
+                .Select(r => new RastreadorDTO
+                {
+                    RastreadorId = r.RastreadorId,
+                    Identificador = r.Identificador,
+                    Imei = r.Imei,
+                    NumeroChip = r.NumeroChip,
+                    Ativo = r.Ativo,
+                    ModoEconomia = r.ModoEconomia,
+                    DataCadastro = r.DataCadastro,
+                    UltimaAtualizacao = r.UltimaAtualizacao,
 
+                    Veiculo = new VeiculoDTO
+                    {
+                        VeiculoId = r.VeiculoId,
+                        Placa = r.Veiculo.Placa,
+                        MarcaModelo = r.Veiculo.MarcaModelo,
+                        TipoVeiculo = r.Veiculo.TipoVeiculo.ToString(),
+                        AnoVeiculo = r.Veiculo.AnoVeiculo
+                    },
 
-                                        Veiculo = new VeiculoDTO
-                                        {
-                                            VeiculoId = r.VeiculoId,
-                                            Placa = r.Veiculo.Placa,
-                                            MarcaModelo = r.Veiculo.MarcaModelo,
-                                            TipoVeiculo = r.Veiculo.TipoVeiculo.ToString(),
-                                            AnoVeiculo = r.Veiculo.AnoVeiculo
-                                        },
+                    PosicaoAtual = r.PosicaoAtual == null
+                        ? null
+                        : new PosicaoDTO
+                        {
+                            Latitude = r.PosicaoAtual.Latitude,
+                            Longitude = r.PosicaoAtual.Longitude,
+                            DataHora = r.PosicaoAtual.DataHora,
 
-                                        PosicaoAtual = new PosicaoDTO
-                                        {
-                                            Latitude = r.PosicaoAtual.Latitude,
-                                            Longitude = r.PosicaoAtual.Longitude,
-                                            DataHora = r.PosicaoAtual.DataHora,
-                                            Ancorado = r.Veiculo.Ancoragem.Ativa
-                                        }
-                                    }).FirstOrDefaultAsync();
+                            Ancorado = r.Veiculo.Ancoragem != null &&
+                                       r.Veiculo.Ancoragem.Ativa
+                        }
+                })
+                .FirstOrDefaultAsync();
 
             if (rastreador == null)
                 return NotFound();
